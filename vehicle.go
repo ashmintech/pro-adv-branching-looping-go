@@ -133,7 +133,9 @@ func (t *truck) truckDetails() {
 }
 
 func generateRating() {
+
 	jsonFile, err := os.Open("feedback.json")
+
 	if err != nil {
 		log.Fatal("File not found")
 	}
@@ -151,29 +153,30 @@ func generateRating() {
 		for _, msg := range v.Feedbacks {
 			var vehRating rating = 5.0
 			vehResult.feedbackTotal++
-			text := strings.Split(msg, " ")
-			for _, word := range text {
-				switch s := strings.Trim(strings.ToLower(word), " ,.,!,?,\t,\n,\r"); s {
-					case "pleasure", "impressed", "wonderful", "fantastic", "splendid":
-						vehRating += extraPositive
-					case "help", "helpful", "thanks", "thank you", "happy":
-						vehRating += positive
-					case "not helpful", "sad", "angry", "improve", "annoy":
-						vehRating += negative
-					case "pathetic", "bad", "worse", "unfortunately", "agitated", "frustrated":
-						vehRating += extraNegative
-					}
-				
-			}
-			switch {
-				case vehRating > 8.0:
-					vehResult.feedbackPositive++
-				case vehRating >= 4.0 && vehRating <= 8.0:
-					vehResult.feedbackNeutral++
-				case vehRating < 4.0:
-					vehResult.feedbackNegative++
+			if text := strings.Split(msg, " ") ; len(text) >= 3 {
+				for _, word := range text {
+					switch s := strings.Trim(strings.ToLower(word), " ,.,!,?,\t,\n,\r"); s {
+						case "pleasure", "impressed", "wonderful", "fantastic", "splendid":
+							vehRating += extraPositive
+						case "help", "helpful", "thanks", "thank you", "happy":
+							vehRating += positive
+						case "not helpful", "sad", "angry", "improve", "annoy":
+							vehRating += negative
+						case "pathetic", "bad", "worse", "unfortunately", "agitated", "frustrated":
+							vehRating += extraNegative
+						}
+					
 				}
-		}
+				switch {
+					case vehRating > 8.0:
+						vehResult.feedbackPositive++
+					case vehRating >= 4.0 && vehRating <= 8.0:
+						vehResult.feedbackNeutral++
+					case vehRating < 4.0:
+						vehResult.feedbackNegative++
+					}
+				}
+			}
 		vehicleResult[v.Name] = vehResult
 	}
 
